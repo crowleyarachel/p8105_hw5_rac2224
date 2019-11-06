@@ -8,4 +8,19 @@ output: github_document
 ## Problem 1
 
 ```{r}
+library(tidyverse)
+
+set.seed(10)
+
+iris_with_missing = iris %>% 
+  map_df(~replace(.x, sample(1:150, 20), NA)) %>%
+  mutate(Species = as.character(Species))
+
+mean_nonmiss = function(x) {
+  x[is.na(x)] <- round(mean(x, na.rm = TRUE), 1)
+  x
+  x[is.character(x)] <- replace_na(x, "virginica")
+}
+
+output = map_df(.x = iris_with_missing, ~ mean_nonmiss(.x))
 ```
