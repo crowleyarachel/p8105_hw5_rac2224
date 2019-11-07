@@ -24,3 +24,25 @@ mean_nonmiss = function(x) {
 
 output = map_df(.x = iris_with_missing, ~ mean_nonmiss(.x))
 ```
+
+## Problem 2
+
+```{r}
+case_control = 
+  list.files(path = "./data", full.names = TRUE)
+
+read_obs = function(path) {
+     test = read.csv(path)
+     control_arm = str_split( path, pattern = "_", simplify = TRUE)
+     type <- paste(c("con","exp"), collapse="|")
+     test$arm = str_extract_all(control_arm[, ncol(control_arm) - 1], pattern = type )
+     test$id = str_extract(control_arm[, ncol(control_arm)], pattern = "\\d{1,2}")
+     test
+}
+
+
+all_data = map_df(.x = case_control, ~read_obs(.x))
+
+```
+
+
