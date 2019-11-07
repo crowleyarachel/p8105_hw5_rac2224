@@ -27,22 +27,31 @@ output = map_df(.x = iris_with_missing, ~ mean_nonmiss(.x))
 
 ## Problem 2
 
+Reading in the data for each subject and creating two new columns for ID and Arm (control vs. experimental)
 ```{r}
 case_control = 
   list.files(path = "./data", full.names = TRUE)
 
 read_obs = function(path) {
      test = read.csv(path)
-     control_arm = str_split( path, pattern = "_", simplify = TRUE)
+     arm = str_split( path, pattern = "_", simplify = TRUE)
      type <- paste(c("con","exp"), collapse="|")
-     test$arm = str_extract_all(control_arm[, ncol(control_arm) - 1], pattern = type )
-     test$id = str_extract(control_arm[, ncol(control_arm)], pattern = "\\d{1,2}")
+     test$control_arm = str_extract_all(arm[, ncol(arm) - 1], pattern = type )
+     test$subject_id = str_extract(arm[, ncol(arm)], pattern = "\\d{1,2}")
      test
 }
 
-
 all_data = map_df(.x = case_control, ~read_obs(.x))
-
 ```
 
+Further tidying the dataset
 
+```{r}
+all_data = all_data %>%
+  janitor::clean_names() %>%
+  pivot_longer(
+    week_1:week_8,
+    names_to = "week", 
+    names_prefix = "week_",
+    values_to = "observation") 
+```
